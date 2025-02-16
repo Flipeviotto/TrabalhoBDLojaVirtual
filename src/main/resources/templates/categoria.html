@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Categoria</title>
+    <style>
+        /* Estilização geral */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        /* Seção de Produtos */
+        .produtos-section {
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .product-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: scale(1.02);
+        }
+        .product-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .price {
+            font-size: 1.2em;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .quantity-controls button {
+            background-color: #27ae60;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+        .quantity-controls button:hover {
+            background-color: #1e8449;
+        }
+        .quantity-controls span {
+            font-size: 1.2em;
+            min-width: 30px;
+            text-align: center;
+        }
+        .stock {
+            font-size: 0.9em;
+            color: #555;
+            text-align: center;
+        }
+        .add-to-cart-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #1e8449;
+        }
+        /* Seção de Subcategorias */
+        .subcategorias-section {
+            margin-top: 20px;
+            padding: 20px;
+        }
+        .categories-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .category-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .category-card:hover {
+            transform: scale(1.05);
+        }
+        .category-card a {
+            text-decoration: none;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${categoriaAtual}">Categoria</h1>
+
+    <!-- Seção de Produtos -->
+    <div class="produtos-section" th:if="${not #lists.isEmpty(produtos)}">
+        <h2>Produtos</h2>
+        <div class="products-grid">
+            <div class="product-card" th:each="produto : ${produtos}">
+                <h3 th:text="${produto.nome}">Nome do Produto</h3>
+                <p class="price" th:text="${'R$ ' + #numbers.formatDecimal(produto.preco, 1, 2)}">R$ 0,00</p>
+                <div class="quantity-controls">
+                    <form th:action="@{/compra/ajustar_quantidade}" method="post">
+                        <input type="hidden" name="idProduto" th:value="${produto.idproduto}">
+                        <input type="hidden" name="operacao" value="decrementar">
+                        <input type="hidden" name="cpfCliente" th:value="${cpfCliente}"> <!-- Novo -->
+                        <button type="submit">-</button>
+                    </form>
+                    
+                    <form th:action="@{/compra/ajustar_quantidade}" method="post">
+                        <input type="hidden" name="idProduto" th:value="${produto.idproduto}">
+                        <input type="hidden" name="operacao" value="incrementar">
+                        <input type="hidden" name="cpfCliente" th:value="${cpfCliente}"> <!-- Novo -->
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+                <div class="stock">
+                    <p>Em estoque: <span th:text="${produto.estoque}">0</span></p>
+                </div>
+                <form th:action="@{/compra/adicionar_ao_carrinho}" method="post">
+                    <input type="hidden" name="idProduto" th:value="${produto.idproduto}">
+                    <input type="hidden" name="cpfCliente" th:value="${cpfCliente}"> <!-- Novo -->
+                    <button type="submit" class="add-to-cart-btn">Adicionar ao Carrinho</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Subcategorias -->
+    <div class="subcategorias-section" th:if="${not #lists.isEmpty(subcategorias)}">
+        <h2>Subcategorias</h2>
+        <div class="categories-grid">
+            <div class="category-card" th:each="subcategoria : ${subcategorias}">
+                <a th:href="@{/categoria/{nome}(nome=${subcategoria.nome}, cpf=${cpfCliente})}">
+                    <h3 th:text="${subcategoria.nome}">Subcategoria</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(produtos) and #lists.isEmpty(subcategorias)}">
+        <p style="text-align: center;">Nenhum produto ou subcategoria encontrada nesta categoria.</p>
+    </div>
+</body>
+</html>

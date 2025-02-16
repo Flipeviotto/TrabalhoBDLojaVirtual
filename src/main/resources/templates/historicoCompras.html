@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Compras</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .status-aprovado { color: #28a745; }
+        .status-pendente { color: #dc3545; }
+        .total-row { font-weight: bold; background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>Histórico de Compras</h1>
+    
+    <div th:each="compra : ${historico}" class="compra-container">
+        <div class="cabecalho-compra">
+            <h3>
+                Data: <span th:text="${#temporals.format(compra.dataCompra, 'dd/MM/yyyy')}"></span>
+                - Status: 
+                <span th:class="${compra.statusAprovado} ? 'status-aprovado' : 'status-pendente'"
+                      th:text="${compra.statusAprovado} ? 'Aprovado' : 'Pendente'"></span>
+                - Total da Compra: 
+                <span th:text="${#numbers.formatCurrency(compra.totalCompra)}"></span>
+            </h3>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Descrição</th>
+                    <th>Marca</th>
+                    <th>Categoria</th>
+                    <th>Preço Unitário</th>
+                    <th>Quantidade</th>
+                    <th>Total Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td th:text="${compra.nomeProduto}"></td>
+                    <td th:text="${compra.descricao}"></td>
+                    <td th:text="${compra.marca}"></td>
+                    <td th:text="${compra.categoria}"></td>
+                    <td th:text="${#numbers.formatCurrency(compra.precoUnitario)}"></td>
+                    <td th:text="${compra.quantidade}"></td>
+                    <td th:text="${#numbers.formatCurrency(compra.totalItem)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${#lists.isEmpty(historico)}" class="sem-compras">
+        <p>Nenhuma compra encontrada em seu histórico.</p>
+    </div>
+</body>
+</html>

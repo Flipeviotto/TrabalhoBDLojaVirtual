@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Categorias</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .categoria { margin-bottom: 10px; }
+        .categoria-pai { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Categorias Disponíveis</h1>
+    
+    <div th:each="categoria : ${categorias}">
+        <div class="categoria">
+            <span th:text="${categoria.nome}"></span>
+            <span th:if="${categoria.nomeCategoriaPai != null}" 
+                  th:text="' (Subcategoria de ' + ${categoria.nomeCategoriaPai} + ')'"></span>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(categorias)}" class="sem-categorias">
+        <p>Nenhuma categoria encontrada.</p>
+    </div>
+</body>
+</html>

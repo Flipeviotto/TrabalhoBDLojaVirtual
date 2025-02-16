@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Imarket</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --background: #f9f9f9;
+            --text-dark: #2c3e50;
+        }
+        .category-card a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Configurações */
+        .settings-sidebar {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .settings-sidebar.active {
+            right: 0;
+        }
+
+        /* Navbar Superior */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+            position: fixed;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Área Principal */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        /* Perfil do Cliente */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-pic input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .profile-info {
+            margin-left: 1.5rem;
+        }
+
+        /* Grid de Categorias */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Botões de Ação */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar de Configurações -->
+    <div class="settings-sidebar" id="settingsSidebar">
+        <h3>Configurações</h3>
+        <ul style="list-style: none; margin-top: 2rem;">
+            <li><button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Dados Pessoais</button></li>
+            <li><button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Alterar Senha</button></li>
+            <li><button class="btn btn-primary" style="width: 100%;" th:href="@{/logout}">Sair</button></li>
+        </ul>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Imarket</div>
+        <div>
+            <button class="btn btn-primary" onclick="toggleSettings()">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Seção do Perfil -->
+        <div class="profile-section">
+            <div class="profile-pic">
+                <input type="file" id="profileUpload" accept="image/*">
+                <i class="fas fa-user-circle" style="font-size: 100px; color: #ccc;"></i>
+            </div>
+            <div class="profile-info">
+                <h2 th:text="${cliente.nome}">Nome do Cliente</h2>
+                <p th:text="${cliente.email}">email@cliente.com</p>
+                <div class="action-buttons">
+                    <a th:href="@{/cliente/historico_compras(cpf=${cliente.cpf})}" class="btn btn-primary">
+                        Histórico de Compras
+                    </a>
+                    <a th:href="@{/cliente/carrinho(cpf=${cliente.cpf})}" class="btn btn-primary">
+                        Carrinho (3)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorias -->
+        <div class="categories-grid">
+            <div class="category-card" th:each="categoria : ${categorias}">
+                <a th:href="@{/cliente/categoria/{nome}(nome=${categoria.nome}, cpf=${cliente.cpf})}" 
+                style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-shopping-basket category-icon"></i>
+                    <h3 th:text="${categoria.nome}">l</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSettings() {
+            document.getElementById('settingsSidebar').classList.toggle('active');
+        }
+
+        // Upload de Foto de Perfil (mantido igual)
+        document.getElementById('profileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.profile-pic i').style.display = 'none';
+                    document.querySelector('.profile-pic').style.background = `url(${e.target.result}) center/cover`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
