@@ -9,7 +9,6 @@ public class Produto {
     private String marca;
     private String nomeCategoria;
 
-    // Construtor, getters e setters
     public Produto() {}
 
     // Getters e Setters

@@ -65,7 +65,6 @@ public class clienteController {
         }
     }
 
-    // Mapeamento explícito para exibir o formulário de login
     @GetMapping("/fazerLogin")
     public String login() {
         return "login";
@@ -83,7 +82,6 @@ public class clienteController {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // Cria um objeto Cliente com os dados do banco
                 Cliente clienteLogado = new Cliente();
                 clienteLogado.setNome(rs.getString("nome"));
                 clienteLogado.setEmail(rs.getString("email"));
@@ -99,7 +97,7 @@ public class clienteController {
                 clienteLogado.setCidade(rs.getString("cidade"));
                 clienteLogado.setSenha(rs.getString("senha"));
 
-                session.setAttribute("clienteLogado", clienteLogado); // Armazena o objeto completo na sessão
+                session.setAttribute("clienteLogado", clienteLogado);
                 return "redirect:/cliente/dashboard";
             } else {
                 return "redirect:/login?erro=Credenciais inválidas";
@@ -113,14 +111,13 @@ public class clienteController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-        // Recupera o cliente da sessão
+
         Cliente cliente = (Cliente) session.getAttribute("clienteLogado");
 
         if (cliente == null) {
-            return "redirect:/login"; // Redireciona se não estiver logado
+            return "redirect:/login";
         }
 
-        // Carrega as categorias pai (aquelas sem categoriaPai)
         List<Categoria> categorias = new ArrayList<>();
         String sqlCategorias = "SELECT nome FROM categoria WHERE nomeCategoriaPai IS NULL";
 
@@ -131,7 +128,7 @@ public class clienteController {
             while (rs.next()) {
                 Categoria categoria = new Categoria(
                         rs.getString("nome"),
-                        null // Garante que a categoria pai seja nula
+                        null // Garante que a categoria pai seja nulo
                 );
                 categorias.add(categoria);
             }
@@ -154,7 +151,6 @@ public class clienteController {
         session.setAttribute("quantidades", new HashMap<Long, Integer>());}
         
         session.setAttribute("categoriaAtualNome", nome);
-        // 1. Carrega os produtos que pertencem à categoria selecionada
         List<Produto> produtos = new ArrayList<>();
         String sqlProdutos = "SELECT * FROM produto WHERE nomeCategoria = ?";
         try (Connection conexao = FabricaDeConexao.getConexao();
@@ -178,7 +174,6 @@ public class clienteController {
             return "erro";
         }
 
-        // 2. Carrega as subcategorias (categorias filhas) que têm a categoria atual como pai
         List<Categoria> subcategorias = new ArrayList<>();
         String sqlSubcategorias = "SELECT nome, nomeCategoriaPai FROM categoria WHERE nomeCategoriaPai = ?";
         try (Connection conexao = FabricaDeConexao.getConexao();
@@ -278,32 +273,6 @@ public class clienteController {
         } catch (SQLException e) {
             e.printStackTrace();
             model.addAttribute("erro", "Erro ao carregar carrinho");
-            return "erro";
-        }
-    }
-
-    //@GetMapping("/categorias")
-    public String categorias(Model model) {
-        List<Categoria> categorias = new ArrayList<>();
-        String sql = "SELECT nome, nomeCategoriaPai FROM categoria";
-
-        try (Connection conexao = FabricaDeConexao.getConexao();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Categoria categoria = new Categoria(
-                        rs.getString("nome"),
-                        rs.getString("nomeCategoriaPai")
-                );
-                categorias.add(categoria);
-            }
-
-            model.addAttribute("categorias", categorias);
-            return "categorias";
-        } catch (SQLException e) {
-            e.printStackTrace();
-            model.addAttribute("erro", "Erro ao carregar categorias");
             return "erro";
         }
     }

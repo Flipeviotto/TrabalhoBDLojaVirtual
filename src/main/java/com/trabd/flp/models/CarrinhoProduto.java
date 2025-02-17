@@ -5,7 +5,6 @@ public class CarrinhoProduto {
     private long idProduto;
     private int quantidade;
 
-    // Construtor, getters e setters
     public CarrinhoProduto(String cpfCliente, long idProduto, int quantidade) {
         this.cpfCliente = cpfCliente;
         this.idProduto = idProduto;

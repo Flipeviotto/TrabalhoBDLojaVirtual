@@ -4,7 +4,7 @@ public class Categoria {
     private String nome;
     private String nomeCategoriaPai;
 
-    public Categoria() {} // Construtor vazio necessário
+    public Categoria() {} 
 
     public Categoria(String nome, String nomeCategoriaPai) {
         this.nome = nome;

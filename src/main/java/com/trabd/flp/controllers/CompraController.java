@@ -40,7 +40,6 @@ public class CompraController {
             session.setAttribute("quantidades", quantidades);
         }
 
-        // Ajusta a quantidade
         int novaQuantidade = quantidades.getOrDefault(idProduto, 0);
         if ("incrementar".equals(operacao)) {
             novaQuantidade++;
@@ -65,7 +64,6 @@ public class CompraController {
         if (quantidade > 0) {
             
             try (Connection conexao = FabricaDeConexao.getConexao()) {
-                // 1. Atualiza estoque
                 String sqlEstoque = "UPDATE produto SET estoque = estoque - ? WHERE idproduto = ?";
                 try (PreparedStatement stmt = conexao.prepareStatement(sqlEstoque)) {
                     stmt.setInt(1, quantidade);
@@ -73,7 +71,6 @@ public class CompraController {
                     stmt.executeUpdate();
                 }
 
-                // 2. Adiciona ao carrinho
                 String sqlCarrinho = "INSERT INTO carrinhoProduto (cpfCliente, idProduto, quantidade) "
                                     + "VALUES (?, ?, ?) "
                                     + "ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)";
@@ -83,8 +80,6 @@ public class CompraController {
                     stmt.setInt(3, quantidade);
                     stmt.executeUpdate();
                 }
-
-                // 3. Limpa quantidade temporária
                 quantidades.remove(idProduto);
 
             } catch (SQLException e) {
